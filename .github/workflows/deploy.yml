@@ -10,4 +10,4 @@ jobs:
     steps:
       - name: Deploy to firebase
         shell: bash
-        run: ./deploy.sh
+        run: ./scripts/deploy.sh
