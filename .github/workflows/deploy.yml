@@ -5,6 +5,7 @@ on:
     branches: [master]
 
 jobs:
+  runs-on: ubuntu-latest
   deploy:
     steps:
       - name: Deploy to firebase
