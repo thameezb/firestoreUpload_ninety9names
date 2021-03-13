@@ -1,0 +1,12 @@
+name: deploy
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    steps:
+      - name: Deploy to firebase
+        shell: bash
+        run: ./deploy.sh
