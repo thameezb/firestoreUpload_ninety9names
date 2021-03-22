@@ -84,7 +84,7 @@ func readCSVData(path string) (*[]Name, error) {
 
 func writeToFirestore(names *[]Name, db *firestore.Client, ctx context.Context) error {
 	for _, n := range *names {
-		if _, _, err := db.Collection("names").Add(ctx, n); err != nil {
+		if _, err := db.Collection("names").Doc(n.ID).Set(ctx, n); err != nil {
 			return err
 		}
 	}
