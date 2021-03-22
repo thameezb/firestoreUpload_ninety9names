@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Deploy to firebase
+      - name: Deploy to firestore
         shell: bash
         env:
-          FIREBASE_SA_KEY: ${{ secrets.FIREBASE_SA_KEY }}
+          GOOGLE_SA_KEY: ${{ secrets.GOOGLE_SA_KEY }}
         run: ./deploy.sh
