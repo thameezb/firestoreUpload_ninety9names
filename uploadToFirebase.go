@@ -3,12 +3,11 @@ package main
 import (
 	"context"
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 
+	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
-	"firebase.google.com/go/db"
 )
 
 type Name struct {
@@ -20,11 +19,9 @@ type Name struct {
 }
 
 func main() {
-	dbURL := os.Getenv("FIREBASEDB_URL")
-	if dbURL == "" {
-		dbURL = "https://ninety9names-3b97e-default-rtdb.firebaseio.com/"
-	}
-	db, err := mustInitDB(dbURL)
+	ctx := context.Background()
+
+	db, err := mustInitDB(ctx)
 	if err != nil {
 		log.Fatalf("error connecting to db %s", err)
 	}
@@ -38,19 +35,19 @@ func main() {
 		log.Fatalf("error reading CSV %s", err)
 	}
 
-	if err := writeToFireBase(names, db); err != nil {
+	if err := writeToFirestore(names, db, ctx); err != nil {
 		log.Fatalf("error writing to DB %s", err)
 	}
 	log.Print("Upload Complete")
 }
 
-func mustInitDB(dbURL string) (*db.Client, error) {
-	app, err := firebase.NewApp(context.Background(), nil)
+func mustInitDB(ctx context.Context) (*firestore.Client, error) {
+	app, err := firebase.NewApp(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	db, err := app.DatabaseWithURL(context.Background(), dbURL)
+	db, err := app.Firestore(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -85,9 +82,9 @@ func readCSVData(path string) (*[]Name, error) {
 	return &names, nil
 }
 
-func writeToFireBase(names *[]Name, db *db.Client) error {
+func writeToFirestore(names *[]Name, db *firestore.Client, ctx context.Context) error {
 	for _, n := range *names {
-		if err := db.NewRef(fmt.Sprintf("names/%s", n.ID)).Set(context.Background(), n); err != nil {
+		if _, _, err := db.Collection("names").Add(ctx, n); err != nil {
 			return err
 		}
 	}
